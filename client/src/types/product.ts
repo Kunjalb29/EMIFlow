@@ -90,3 +90,20 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+export interface WishlistItem {
+  wishlistId?: string;
+  addedAt?: string;
+  product: ProductListItem;
+}
+
+export interface RecentlyViewedItem {
+  id: string;
+  name: string;
+  slug: string;
+  brand: string;
+  startingPrice: number;
+  mrp: number;
+  image: string;
+  viewedAt: number;
+}

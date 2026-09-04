@@ -6,6 +6,7 @@ import productRoutes from './routes/product.routes';
 import healthRoutes from './routes/health.routes';
 import authRoutes from './routes/auth.routes';
 import assistantRoutes from './routes/assistant.routes';
+import wishlistRoutes from './routes/wishlist.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/assistant', assistantRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Error handling
 app.use(notFoundHandler);

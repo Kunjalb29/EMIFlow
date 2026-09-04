@@ -72,11 +72,16 @@ Available application paths:
 - /product/iphone-17-pro
 - /product/samsung-galaxy-s25-ultra
 - /product/oneplus-13
+- /compare
+- /wishlist
 - /how-it-works
 - /about
 - /profile
 - /login
 - /signup
+
+When user asks about comparing phones, specs, or EMI plans side-by-side, recommend navigating to /compare.
+When user asks about saved items or their wishlist, recommend navigating to /wishlist.
 
 Respond ONLY with valid JSON in this exact structure:
 {
@@ -214,8 +219,30 @@ Generate a helpful response and navigation actions:`;
       };
     }
 
+    // Wishlist query
+    if (query.includes('wishlist') || query.includes('saved') || query.includes('favorite') || query.includes('save for later')) {
+      return {
+        message: 'You can view, manage, and finance your saved smartphones anytime in your personal Wishlist. Tap the heart icon on any device to keep track of it!',
+        actions: [
+          { type: 'navigate', label: 'Open My Wishlist', path: '/wishlist' },
+          { type: 'navigate', label: 'Browse Products', path: '/products' },
+        ],
+      };
+    }
+
+    // Comparison query
+    if (query.includes('compare') || query.includes('versus') || query.includes(' vs ') || query.includes('difference')) {
+      return {
+        message: 'You can compare up to 3 smartphones side-by-side on technical specifications, cameras, display, battery, starting prices, and EMI terms using our interactive Comparison matrix!',
+        actions: [
+          { type: 'navigate', label: 'Open Comparison Tool', path: '/compare' },
+          { type: 'navigate', label: 'Browse Catalog', path: '/products' },
+        ],
+      };
+    }
+
     // General Catalog or comparison
-    if (query.includes('phone') || query.includes('catalog') || query.includes('what') || query.includes('available') || query.includes('list') || query.includes('compare')) {
+    if (query.includes('phone') || query.includes('catalog') || query.includes('what') || query.includes('available') || query.includes('list')) {
       const summaryList = products
         .map((p) => `• **${p.name}** (from ₹${p.variants[0]?.sellingPrice.toLocaleString('en-IN')})`)
         .join('\n');

@@ -1,4 +1,4 @@
-import type { ProductListItem, ProductDetail, VariantDetail, Review } from '../types/product';
+import type { ProductListItem, ProductDetail, VariantDetail, Review, WishlistItem } from '../types/product';
 import type { User, SavedPlan, AssistantResponse } from '../types/auth';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
@@ -82,6 +82,14 @@ export const api = {
       body: data,
     }),
 
+  // Wishlist endpoints
+  getWishlist: () => fetchApi<WishlistItem[]>('/api/wishlist'),
+  getWishlistIds: () => fetchApi<string[]>('/api/wishlist/ids'),
+  addToWishlist: (productId: string) =>
+    fetchApi<any>(`/api/wishlist/${productId}`, { method: 'POST' }),
+  removeFromWishlist: (productId: string) =>
+    fetchApi<{ success: boolean }>(`/api/wishlist/${productId}`, { method: 'DELETE' }),
+
   // AI Assistant endpoint
   chatWithAssistant: (data: { message: string; context?: { currentPath?: string; selectedProduct?: string | null } }) =>
     fetchApi<AssistantResponse>('/api/assistant/chat', {
@@ -89,3 +97,4 @@ export const api = {
       body: data,
     }),
 };
+

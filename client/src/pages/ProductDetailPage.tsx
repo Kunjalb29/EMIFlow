@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { ShieldCheck, Zap, ArrowRight, Share2 } from 'lucide-react';
+import { ShieldCheck, Zap, ArrowRight, Share2, Heart } from 'lucide-react';
 import { useProduct } from '../hooks/useProduct';
+import { useWishlist } from '../context/WishlistContext';
+import { useCompare } from '../context/CompareContext';
 import ProductGallery from '../components/ProductGallery';
 import VariantSelector from '../components/VariantSelector';
 import PriceSection from '../components/PriceSection';
@@ -12,6 +14,7 @@ import ReviewSection from '../components/ReviewSection';
 import CheckoutModal from '../components/CheckoutModal';
 import StarRating from '../components/StarRating';
 import Breadcrumbs from '../components/Breadcrumbs';
+import RecentlyViewed, { recordRecentlyViewed } from '../components/RecentlyViewed';
 import { ProductDetailSkeleton } from '../components/LoadingSkeleton';
 import ErrorState from '../components/ErrorState';
 import { formatPrice } from '../utils/format';
@@ -38,12 +41,24 @@ export default function ProductDetailPage() {
     refetch,
   } = useProduct(slug, initialVariantId);
 
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isInCompare, addToCompare, removeFromCompare } = useCompare();
+
   useEffect(() => {
-    if (product) {
+    if (product && selectedVariant) {
       document.title = `${product.name} on No-Cost EMI | EMIFlow`;
+      recordRecentlyViewed({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        brand: product.brand,
+        startingPrice: selectedVariant.sellingPrice,
+        mrp: selectedVariant.mrp,
+        image: images[0]?.url || '',
+      });
     }
     window.scrollTo(0, 0);
-  }, [product]);
+  }, [product, selectedVariant, images]);
 
   if (loading) {
     return <ProductDetailSkeleton />;
@@ -109,7 +124,89 @@ export default function ProductDetailPage() {
               <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-slate-100 text-slate-700">
                 {product.brand}
               </span>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                {/* Wishlist Button */}
+                <button
+                  type="button"
+                  aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                  onClick={() => {
+                    const cheapest = variants.reduce(
+                      (prev, curr) => (prev.sellingPrice < curr.sellingPrice ? prev : curr),
+                      selectedVariant
+                    );
+                    toggleWishlist({
+                      id: product.id,
+                      name: product.name,
+                      slug: product.slug,
+                      brand: product.brand,
+                      category: product.category,
+                      rating: product.rating,
+                      reviewCount: product.reviewCount,
+                      startingPrice: cheapest.sellingPrice,
+                      mrp: cheapest.mrp,
+                      cashback: cheapest.cashback,
+                      image: images[0]?.url || '',
+                      variantCount: variants.length,
+                      colors: [...new Set(variants.map((v) => v.color))],
+                    });
+                  }}
+                  className={`p-2 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+                    isInWishlist(product.id)
+                      ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/40 dark:border-red-800'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-red-500 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <Heart
+                    className={`w-3.5 h-3.5 ${
+                      isInWishlist(product.id) ? 'fill-current text-red-500' : ''
+                    }`}
+                  />
+                  <span>{isInWishlist(product.id) ? 'Wishlisted' : 'Wishlist'}</span>
+                </button>
+
+                {/* Compare Button */}
+                <button
+                  type="button"
+                  aria-label={isInCompare(product.id) ? 'Remove from compare' : 'Add to compare'}
+                  onClick={() => {
+                    const cheapest = variants.reduce(
+                      (prev, curr) => (prev.sellingPrice < curr.sellingPrice ? prev : curr),
+                      selectedVariant
+                    );
+                    const pItem = {
+                      id: product.id,
+                      name: product.name,
+                      slug: product.slug,
+                      brand: product.brand,
+                      category: product.category,
+                      rating: product.rating,
+                      reviewCount: product.reviewCount,
+                      startingPrice: cheapest.sellingPrice,
+                      mrp: cheapest.mrp,
+                      cashback: cheapest.cashback,
+                      image: images[0]?.url || '',
+                      variantCount: variants.length,
+                      colors: [...new Set(variants.map((v) => v.color))],
+                    };
+                    if (isInCompare(product.id)) {
+                      removeFromCompare(product.id);
+                    } else {
+                      addToCompare(pItem);
+                    }
+                  }}
+                  className={`p-2 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+                    isInCompare(product.id)
+                      ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:border-blue-800'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  <span>{isInCompare(product.id) ? 'Comparing' : 'Compare'}</span>
+                </button>
+
+                {/* Share Button */}
                 <button
                   type="button"
                   aria-label="Share"
@@ -121,7 +218,7 @@ export default function ProductDetailPage() {
                       alert('Link copied to clipboard!');
                     }
                   }}
-                  className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                  className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
                 >
                   <Share2 className="w-4 h-4" />
                 </button>
@@ -248,6 +345,9 @@ export default function ProductDetailPage() {
           reviewCount={product.reviewCount}
         />
       </div>
+
+      {/* Recently Viewed Smartphones */}
+      <RecentlyViewed currentProductId={product.id} />
 
       {/* Checkout Drawer / Modal */}
       {selectedPlan && (

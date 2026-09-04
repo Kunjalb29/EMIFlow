@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, Sparkles, Menu, X, User as UserIcon, LogOut, ChevronDown, Smartphone } from 'lucide-react';
+import { Search, Sparkles, Menu, X, User as UserIcon, LogOut, ChevronDown, Smartphone, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useCompare } from '../context/CompareContext';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -9,6 +11,8 @@ export default function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { user, logout } = useAuth();
+  const { count: wishlistCount } = useWishlist();
+  const { count: compareCount } = useCompare();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -64,7 +68,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-7">
             <Link
               to="/products"
               className={`text-sm font-semibold transition-colors ${
@@ -72,6 +76,19 @@ export default function Navbar() {
               }`}
             >
               Products
+            </Link>
+            <Link
+              to="/compare"
+              className={`text-sm font-semibold transition-colors flex items-center gap-1.5 ${
+                isActive('/compare') ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'
+              }`}
+            >
+              <span>Compare</span>
+              {compareCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 text-[11px] font-bold flex items-center justify-center">
+                  {compareCount}
+                </span>
+              )}
             </Link>
             <Link
               to="/how-it-works"
@@ -91,8 +108,8 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Right Section: AI Assistant, Search & Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right Section: AI Assistant, Wishlist & Auth */}
+          <div className="hidden md:flex items-center gap-2.5">
             {/* Search Button */}
             <Link
               to="/products"
@@ -101,6 +118,25 @@ export default function Navbar() {
               title="Search Catalog"
             >
               <Search size={19} />
+            </Link>
+
+            {/* Wishlist Link with Badge */}
+            <Link
+              to="/wishlist"
+              className={`relative p-2 rounded-xl transition-colors ${
+                isActive('/wishlist')
+                  ? 'text-red-600 bg-red-50'
+                  : 'text-slate-500 hover:text-red-500 hover:bg-slate-100'
+              }`}
+              aria-label="Wishlist"
+              title="My Wishlist"
+            >
+              <Heart size={19} className={wishlistCount > 0 ? 'fill-current text-red-500' : ''} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
+                  {wishlistCount}
+                </span>
+              )}
             </Link>
 
             {/* AI Assistant Quick Trigger */}
@@ -155,6 +191,39 @@ export default function Navbar() {
                       </Link>
 
                       <Link
+                        to="/wishlist"
+                        className="flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-red-500 transition-colors"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Heart className="w-4 h-4 text-slate-400" /> My Wishlist
+                        </div>
+                        {wishlistCount > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-[10px] font-bold">
+                            {wishlistCount}
+                          </span>
+                        )}
+                      </Link>
+
+                      <Link
+                        to="/compare"
+                        className="flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>
+                          Compare Devices
+                        </div>
+                        {compareCount > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold">
+                            {compareCount}
+                          </span>
+                        )}
+                      </Link>
+
+                      <Link
                         to="/profile"
                         className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-orange-600 transition-colors"
                         onClick={() => setDropdownOpen(false)}
@@ -194,6 +263,18 @@ export default function Navbar() {
 
           {/* Mobile Menu Toggle Button */}
           <div className="md:hidden flex items-center gap-2">
+            <Link
+              to="/wishlist"
+              className="relative p-2 text-slate-600 hover:text-red-500"
+              aria-label="Wishlist"
+            >
+              <Heart size={19} className={wishlistCount > 0 ? 'fill-current text-red-500' : ''} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
             <button
               onClick={openAiAssistant}
               className="p-2 text-orange-600 bg-orange-50 rounded-lg"
@@ -221,6 +302,28 @@ export default function Navbar() {
               className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-orange-600 transition-colors"
             >
               Products Catalog
+            </Link>
+            <Link
+              to="/compare"
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-orange-600 transition-colors"
+            >
+              <span>Compare Smartphones</span>
+              {compareCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
+                  {compareCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              to="/wishlist"
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-orange-600 transition-colors"
+            >
+              <span>My Wishlist</span>
+              {wishlistCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-bold">
+                  {wishlistCount}
+                </span>
+              )}
             </Link>
             <Link
               to="/how-it-works"
