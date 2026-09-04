@@ -1,5 +1,10 @@
 # EMIFlow — Full-Stack Smartphone Financing & E-Commerce Platform
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-emi--flow--zeta.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://emi-flow-zeta.vercel.app)
+[![Deployment](https://img.shields.io/badge/Status-Live%20on%20Vercel-success?style=for-the-badge&logo=vercel)](https://emi-flow-zeta.vercel.app)
+
+> 🌐 **Live Demo Website**: **[https://emi-flow-zeta.vercel.app](https://emi-flow-zeta.vercel.app)**
+
 EMIFlow is a modern, production-grade fintech/e-commerce web application where users can explore flagship smartphones, configure variants, compare transparent No-Cost EMI plans, manage persistent wishlists, evaluate devices side-by-side in a comparison matrix, complete paperless financing applications, and interact with a context-aware AI Shopping Assistant.
 
 ---
@@ -180,7 +185,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## ☁️ Deploying to Vercel
+## ☁️ Live Deployment & Vercel Setup
+
+- 🌐 **Live Website**: **[https://emi-flow-zeta.vercel.app](https://emi-flow-zeta.vercel.app)**
+- 📦 **GitHub Repository**: **[https://github.com/Kunjalb29/EMIFlow](https://github.com/Kunjalb29/EMIFlow)**
 
 The project is pre-configured with `vercel.json` and monorepo scripts for seamless deployment on Vercel.
 
