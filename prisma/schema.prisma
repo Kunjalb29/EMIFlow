@@ -21,6 +21,7 @@ model Product {
   updatedAt   DateTime  @updatedAt
   variants    Variant[]
   reviews     Review[]
+  savedPlans  SavedPlan[]
 
   @@index([brand])
   @@index([slug])
@@ -43,6 +44,7 @@ model Variant {
   product      Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   images       ProductImage[]
   emiPlans     EmiPlan[]
+  savedPlans   SavedPlan[]
 
   @@index([productId])
   @@index([sku])
@@ -61,17 +63,18 @@ model ProductImage {
 }
 
 model EmiPlan {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   variantId     String
   tenureMonths  Int
   monthlyAmount Float
-  interestRate  Float    @default(0)
+  interestRate  Float       @default(0)
   totalAmount   Float
-  cashback      Float    @default(0)
-  processingFee Float    @default(0)
-  isPopular     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  variant       Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  cashback      Float       @default(0)
+  processingFee Float       @default(0)
+  isPopular     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  variant       Variant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  savedPlans    SavedPlan[]
 
   @@index([variantId])
   @@index([tenureMonths])
@@ -91,3 +94,34 @@ model Review {
   @@index([productId])
   @@index([rating])
 }
+
+model User {
+  id           String      @id @default(cuid())
+  name         String
+  email        String      @unique
+  passwordHash String
+  avatarUrl    String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  savedPlans   SavedPlan[]
+
+  @@index([email])
+}
+
+model SavedPlan {
+  id           String    @id @default(cuid())
+  userId       String
+  productId    String
+  variantId    String
+  emiPlanId    String
+  status       String    @default("SUBMITTED")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product      Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant      Variant   @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  emiPlan      EmiPlan   @relation(fields: [emiPlanId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+

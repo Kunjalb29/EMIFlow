@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { ShieldCheck, Zap, ArrowRight, Share2 } from 'lucide-react';
 import { useProduct } from '../hooks/useProduct';
 import ProductGallery from '../components/ProductGallery';
@@ -18,6 +18,9 @@ import { formatPrice } from '../utils/format';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const initialVariantId = searchParams.get('variantId') || undefined;
+
   const {
     product,
     variants,
@@ -33,7 +36,7 @@ export default function ProductDetailPage() {
     isCheckoutOpen,
     setIsCheckoutOpen,
     refetch,
-  } = useProduct(slug);
+  } = useProduct(slug, initialVariantId);
 
   useEffect(() => {
     if (product) {

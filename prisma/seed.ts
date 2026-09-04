@@ -1,9 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Clean existing data
+  await prisma.savedPlan.deleteMany();
+  await prisma.user.deleteMany();
   await prisma.review.deleteMany();
   await prisma.emiPlan.deleteMany();
   await prisma.productImage.deleteMany();
@@ -395,6 +398,37 @@ async function main() {
   }
 
   console.log('✅ Reviews created');
+
+  // ========================================
+  // Demo User & Sample Saved Plan
+  // ========================================
+  const passwordHash = await bcrypt.hash('Password123!', 10);
+  const demoUser = await prisma.user.create({
+    data: {
+      name: 'Kunjal Sharma',
+      email: 'demo@emiflow.com',
+      passwordHash,
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
+    },
+  });
+
+  const sampleEmiPlan = await prisma.emiPlan.findFirst({
+    where: { variantId: iphoneSilver256.id, tenureMonths: 6 },
+  });
+
+  if (sampleEmiPlan) {
+    await prisma.savedPlan.create({
+      data: {
+        userId: demoUser.id,
+        productId: iphone.id,
+        variantId: iphoneSilver256.id,
+        emiPlanId: sampleEmiPlan.id,
+        status: 'APPROVED',
+      },
+    });
+  }
+
+  console.log('✅ Demo user & sample saved plan created (demo@emiflow.com / Password123!)');
   console.log('\n🎉 Seed complete! Database is ready.');
 }
 
