@@ -1,4 +1,13 @@
 {
+  "name": "emiflow",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix client",
+    "client:dev": "npm run dev --prefix client",
+    "client:build": "npm run build --prefix client",
+    "server:dev": "npm run dev --prefix server",
+    "server:build": "npm run build --prefix server"
+  },
   "devDependencies": {
     "prisma": "^5.22.0"
   },
